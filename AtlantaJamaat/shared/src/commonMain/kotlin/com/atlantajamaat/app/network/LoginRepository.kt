@@ -1,14 +1,10 @@
 package com.atlantajamaat.app.network
 
-import com.atlantajamaat.app.models.AUTH_TYPE
-import com.atlantajamaat.app.models.JAMAAT_ID
+import com.atlantajamaat.app.models.*
 import com.atlantajamaat.app.models.LoginRequest
 import com.atlantajamaat.app.models.LoginResponse
 import com.atlantajamaat.app.models.LoginState
-import com.atlantajamaat.app.models.MEDIUM
-import com.atlantajamaat.app.models.VERSION
 import io.ktor.client.HttpClient
-import io.ktor.client.call.body
 import io.ktor.client.plugins.contentnegotiation.ContentNegotiation
 import io.ktor.client.request.post
 import io.ktor.client.request.setBody

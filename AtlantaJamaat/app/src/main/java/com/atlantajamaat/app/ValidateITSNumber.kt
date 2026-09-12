@@ -15,7 +15,6 @@ import androidx.compose.ui.text.input.KeyboardType
 import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
-import com.atlantajamaat.app.models.LoginRequest
 import com.atlantajamaat.app.models.LoginState
 import com.atlantajamaat.app.network.LoginRepository
 import com.atlantajamaat.app.platform.platform
