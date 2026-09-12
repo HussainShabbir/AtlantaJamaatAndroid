@@ -10,6 +10,7 @@ sealed class Screen(val route: String) {
     object ValidateITS: Screen("validateITS")
     object GuestLogin: Screen("guestLogin")
     object MemberLogin: Screen("memberLogin")
+    object ForgotPassword: Screen("forgotPassword")
 }
 // AppNavigation.kt
 @Composable
@@ -36,7 +37,15 @@ fun AppNavigation() {
 
         // Guest Login Route
         composable(route = Screen.GuestLogin.route) {
-            GuestLoginScreen(onLoginClick = {})
+            GuestLoginScreen(onLoginClick = {}, onForgotPasswordClick ={
+                navController.navigate(Screen.ForgotPassword.route)
+            })
+        }
+
+        // Forgot Password Route
+        composable(route = Screen.ForgotPassword.route) {
+            ForgotPasswordScreen(onSendEmailClick = {}, onBackClick = {
+                navController.popBackStack()})
         }
     }
 }

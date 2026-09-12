@@ -47,7 +47,6 @@ fun MemberLoginScreen() {
                         )
 
                         // WebView Settings
-                        settings.javaScriptEnabled = true
                         settings.domStorageEnabled = true
                         settings.loadWithOverviewMode = true
                         settings.useWideViewPort = true

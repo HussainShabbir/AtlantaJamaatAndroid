@@ -1,6 +1,5 @@
 package com.atlantajamaat.app
 
-import android.widget.Space
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Spacer
@@ -11,7 +10,7 @@ import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.foundation.text.KeyboardOptions
 import androidx.compose.material.icons.Icons
-import androidx.compose.material.icons.filled.Lock
+import androidx.compose.material.icons.filled.Email
 import androidx.compose.material.icons.filled.Person
 import androidx.compose.material3.Button
 import androidx.compose.material3.ButtonDefaults
@@ -33,7 +32,6 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.input.KeyboardType
-import androidx.compose.ui.text.input.PasswordVisualTransformation
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import com.atlantajamaat.app.ui.theme.AppTopBar
@@ -41,18 +39,20 @@ import com.example.app.ui.theme.DarkBlue
 import com.example.app.ui.theme.LightGreyBg
 
 @Composable
-fun GuestLoginScreen(
-    onLoginClick: () -> Unit,
-    onForgotPasswordClick: () -> Unit
+fun ForgotPasswordScreen(
+    onSendEmailClick: () -> Unit,
+    onBackClick: () -> Unit
 ) {
     var itsId by remember { mutableStateOf("") }
-    var password by remember { mutableStateOf("") }
-    val isButtonEnabled = itsId.isNotBlank() && password.isNotBlank()
+    var email by remember { mutableStateOf("") }
+
+    val isButtonEnabled = itsId.isNotBlank() && email.isNotBlank()
 
     Scaffold(
         topBar = {
             AppTopBar(
-                title = "Guest Login"
+                title = "Forgot Password",
+                onBackClick = onBackClick
             )
         },
         containerColor = LightGreyBg
@@ -80,7 +80,7 @@ fun GuestLoginScreen(
                         horizontalAlignment = Alignment.CenterHorizontally
                     ) {
                         Text(
-                            text = "Guest Login",
+                            text = "Reset Password",
                             fontSize = 20.sp,
                             fontWeight = FontWeight.Bold,
                             color = Color(0xFF1E293B)
@@ -89,7 +89,7 @@ fun GuestLoginScreen(
                         Spacer(modifier = Modifier.height(6.dp))
 
                         Text(
-                            text = "Enter your credentials to proceed",
+                            text = "Enter your ITS ID and registered email to receive reset instructions.",
                             fontSize = 13.sp,
                             color = Color.Gray
                         )
@@ -99,7 +99,11 @@ fun GuestLoginScreen(
                         // ITS ID Input Field
                         OutlinedTextField(
                             value = itsId,
-                            onValueChange = { itsId = it },
+                            onValueChange = { input ->
+                                if (input.all { it.isDigit() }) {
+                                    itsId = input
+                                }
+                            },
                             label = { Text("ITS ID") },
                             leadingIcon = {
                                 Icon(
@@ -115,29 +119,28 @@ fun GuestLoginScreen(
 
                         Spacer(modifier = Modifier.height(16.dp))
 
-                        // Password Input Field
+                        // Email Input Field
                         OutlinedTextField(
-                            value = password,
-                            onValueChange = { password = it },
-                            label = { Text("Password") },
+                            value = email,
+                            onValueChange = { email = it },
+                            label = { Text("Email Address") },
                             leadingIcon = {
                                 Icon(
-                                    imageVector = Icons.Default.Lock,
-                                    contentDescription = "Password Icon"
+                                    imageVector = Icons.Default.Email,
+                                    contentDescription = "Email Icon"
                                 )
                             },
                             singleLine = true,
-                            visualTransformation = PasswordVisualTransformation(),
-                            keyboardOptions = KeyboardOptions(keyboardType = KeyboardType.Password),
+                            keyboardOptions = KeyboardOptions(keyboardType = KeyboardType.Email),
                             modifier = Modifier.fillMaxWidth(),
                             shape = RoundedCornerShape(10.dp)
                         )
 
                         Spacer(modifier = Modifier.height(24.dp))
 
-                        // Login Button
+                        // Send Email Button
                         Button(
-                            onClick = { onLoginClick() },
+                            onClick = { onSendEmailClick() },
                             enabled = isButtonEnabled,
                             modifier = Modifier
                                 .fillMaxWidth()
@@ -149,23 +152,23 @@ fun GuestLoginScreen(
                             )
                         ) {
                             Text(
-                                text = "Login",
+                                text = "Send Email",
                                 fontSize = 16.sp,
                                 fontWeight = FontWeight.SemiBold,
                                 color = Color.White
                             )
                         }
 
-                        Spacer(Modifier.height(16.dp))
+                        Spacer(modifier = Modifier.height(12.dp))
 
-                        // Forgot Password Button
+                        // Back to Login Link
                         TextButton(
-                            onClick = {onForgotPasswordClick() },
-                            modifier = Modifier.align(Alignment.End)
+                            onClick = onBackClick
                         ) {
                             Text(
-                                text = "Forgot Password?",
+                                text = "Back to Login",
                                 fontSize = 14.sp,
+                                fontWeight = FontWeight.SemiBold,
                                 color = DarkBlue
                             )
                         }
