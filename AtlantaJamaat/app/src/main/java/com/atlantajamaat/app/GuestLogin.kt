@@ -1,6 +1,5 @@
 package com.atlantajamaat.app
 
-import android.widget.Space
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Spacer
@@ -8,6 +7,7 @@ import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
+import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.foundation.text.KeyboardOptions
 import androidx.compose.material.icons.Icons
@@ -17,6 +17,7 @@ import androidx.compose.material3.Button
 import androidx.compose.material3.ButtonDefaults
 import androidx.compose.material3.Card
 import androidx.compose.material3.CardDefaults
+import androidx.compose.material3.CircularProgressIndicator
 import androidx.compose.material3.Icon
 import androidx.compose.material3.OutlinedTextField
 import androidx.compose.material3.Scaffold
@@ -27,6 +28,7 @@ import androidx.compose.runtime.Composable
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
+import androidx.compose.runtime.rememberCoroutineScope
 import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
@@ -36,9 +38,13 @@ import androidx.compose.ui.text.input.KeyboardType
 import androidx.compose.ui.text.input.PasswordVisualTransformation
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
+import com.atlantajamaat.app.models.LoginState
+import com.atlantajamaat.app.network.LoginRepository
+import com.atlantajamaat.app.platform.platform
 import com.atlantajamaat.app.ui.theme.AppTopBar
 import com.example.app.ui.theme.DarkBlue
 import com.example.app.ui.theme.LightGreyBg
+import kotlinx.coroutines.launch
 
 @Composable
 fun GuestLoginScreen(
@@ -47,7 +53,12 @@ fun GuestLoginScreen(
 ) {
     var itsId by remember { mutableStateOf("") }
     var password by remember { mutableStateOf("") }
+    var isLoading by remember { mutableStateOf(false) }
+    var apiResponse by remember { mutableStateOf<LoginState?>(null) }
+    var isError by remember { mutableStateOf(false) }
+    val loginRepository = LoginRepository()
     val isButtonEnabled = itsId.isNotBlank() && password.isNotBlank()
+    val coroutineScope = rememberCoroutineScope()
 
     Scaffold(
         topBar = {
@@ -137,23 +148,48 @@ fun GuestLoginScreen(
 
                         // Login Button
                         Button(
-                            onClick = { onLoginClick() },
-                            enabled = isButtonEnabled,
+                            onClick = {
+                                if ((itsId.isBlank() || itsId.length < 8) && password.isBlank()) {
+                                    isError = true
+                                } else {
+                                    isError = false
+                                    isLoading = true
+                                    apiResponse = null
+                                    // Trigger API Call inside Coroutine Scope
+                                    coroutineScope.launch {
+                                        apiResponse = guestLogin(
+                                            loginRepository, itsId, password,
+                                            platform()
+                                        )
+                                        isLoading = false
+                                        onLoginClick()
+                                    }
+                                }
+                            },
+                            enabled = !isLoading,
                             modifier = Modifier
                                 .fillMaxWidth()
-                                .height(50.dp),
-                            shape = RoundedCornerShape(10.dp),
+                                .height(52.dp),
+                            shape = RoundedCornerShape(12.dp),
                             colors = ButtonDefaults.buttonColors(
                                 containerColor = DarkBlue,
-                                disabledContainerColor = Color(0xFF94A3B8)
+                                contentColor = Color.White
                             )
                         ) {
-                            Text(
-                                text = "Login",
-                                fontSize = 16.sp,
-                                fontWeight = FontWeight.SemiBold,
-                                color = Color.White
-                            )
+                            if (isLoading) {
+                                CircularProgressIndicator(
+                                    modifier = Modifier.size(24.dp),
+                                    color = Color.White,
+                                    strokeWidth = 2.5.dp
+                                )
+                            } else {
+                                Text(
+                                    text = "Login",
+                                    fontSize = 16.sp,
+                                    fontWeight = FontWeight.SemiBold,
+                                    color = Color.White
+                                )
+                            }
                         }
 
                         Spacer(Modifier.height(16.dp))
@@ -174,4 +210,7 @@ fun GuestLoginScreen(
             }
         }
     }
+}
+suspend fun guestLogin(loginRepository: LoginRepository, itsId: String, password: String, userAgent: String): LoginState {
+    return loginRepository.performLogin(itsId, userAgent, password, isGuestLogin = true)
 }

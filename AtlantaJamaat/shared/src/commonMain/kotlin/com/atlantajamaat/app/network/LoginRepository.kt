@@ -33,9 +33,9 @@ class LoginRepository {
         }
     }
 
-    suspend fun performLogin(itsId: String, userAgent: String): LoginState = withContext(Dispatchers.IO) {
+    suspend fun performLogin(itsId: String, userAgent: String, password: String = "", isGuestLogin: Boolean = false): LoginState = withContext(Dispatchers.IO) {
         return@withContext try {
-            val request = LoginRequest(itsId, JAMAAT_ID, AUTH_TYPE, MEDIUM, userAgent, VERSION)
+            val request = LoginRequest(itsId, JAMAAT_ID, if (isGuestLogin) AUTH_TYPE_101 else AUTH_TYPE_102, MEDIUM, userAgent, VERSION, password)
 
             val httpResponse = httpClient.post("https://www.atlantajamaat.com/API/Security/API/Login") {
                 contentType(ContentType.Application.Json)

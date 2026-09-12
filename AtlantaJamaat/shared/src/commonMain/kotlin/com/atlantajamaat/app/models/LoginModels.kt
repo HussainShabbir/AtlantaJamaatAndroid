@@ -4,7 +4,8 @@ import kotlinx.serialization.SerialName
 import kotlinx.serialization.Serializable
 
 val JAMAAT_ID = "EF9EE9AC-5B08-4AAB-8F29-35115119C988"
-val AUTH_TYPE = 102
+val AUTH_TYPE_101 = 101
+val AUTH_TYPE_102 = 102
 val MEDIUM = "App"
 val VERSION = "2"
 
@@ -39,5 +40,6 @@ data class LoginRequest(
     @SerialName("AuthType") val authType: Int = 102,
     @SerialName("Medium") val medium: String = "App",
     @SerialName("UserAgent") val userAgent: String = "Android",
-    @SerialName("Version") val version: String = "2.0"
+    @SerialName("Version") val version: String = "2.0",
+    @SerialName("Password") val password: String?,
 )
