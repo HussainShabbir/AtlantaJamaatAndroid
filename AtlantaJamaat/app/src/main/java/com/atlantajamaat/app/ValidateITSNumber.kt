@@ -23,10 +23,10 @@ import com.example.app.ui.theme.*
 import kotlinx.coroutines.launch
 
 @Composable
-fun NumberInputApiScreen() {
+fun NumberInputApiScreen(onNavigate: (LoginState) -> Unit) {
     var itsNumber by remember { mutableStateOf("") }
     var isLoading by remember { mutableStateOf(false) }
-    var apiResponse by remember { mutableStateOf<String?>(null) }
+    var apiResponse by remember { mutableStateOf<LoginState?>(null) }
     var isError by remember { mutableStateOf(false) }
     val loginRepository = LoginRepository()
 
@@ -134,6 +134,9 @@ fun NumberInputApiScreen() {
                                         platform()
                                     )
                                     isLoading = false
+                                    apiResponse?.let {
+                                        onNavigate.invoke(it)
+                                    }
                                 }
                             }
                         },
@@ -161,24 +164,6 @@ fun NumberInputApiScreen() {
                             )
                         }
                     }
-
-                    // Display API Response State
-                    apiResponse?.let { result ->
-                        Spacer(modifier = Modifier.height(20.dp))
-                        Surface(
-                            modifier = Modifier.fillMaxWidth(),
-                            color = Color(0xFFE8F5E9),
-                            shape = RoundedCornerShape(10.dp)
-                        ) {
-                            Text(
-                                text = result,
-                                modifier = Modifier.padding(12.dp),
-                                color = Color(0xFF2E7D32),
-                                fontSize = 14.sp,
-                                textAlign = TextAlign.Center
-                            )
-                        }
-                    }
                 }
             }
         }
@@ -186,11 +171,6 @@ fun NumberInputApiScreen() {
 }
 
 // Function Signature Update
-suspend fun validateITS(loginRepository: LoginRepository, itsId: String, userAgent: String): String {
-    return when (val state = loginRepository.performLogin(itsId, userAgent)) {
-        is LoginState.NavigateToGuestLogin -> "Success: Navigate to Welcome"
-        is LoginState.NavigateToMemberLogin -> "Success: Navigate to PreLogin"
-        is LoginState.Error -> "Error: ${state.message}"
-        else -> "Unknown State"
-    }
+suspend fun validateITS(loginRepository: LoginRepository, itsId: String, userAgent: String): LoginState {
+    return loginRepository.performLogin(itsId, userAgent)
 }
