@@ -4,8 +4,8 @@ import com.atlantajamaat.app.models.*
 import com.atlantajamaat.app.models.LoginRequest
 import com.atlantajamaat.app.models.LoginResponse
 import com.atlantajamaat.app.models.LoginState
+import com.russhwolf.settings.Settings
 import io.ktor.client.HttpClient
-import io.ktor.client.call.body
 import io.ktor.client.plugins.contentnegotiation.ContentNegotiation
 import io.ktor.client.request.post
 import io.ktor.client.request.setBody
@@ -20,14 +20,15 @@ import kotlinx.coroutines.withContext
 import kotlinx.serialization.json.Json
 
 class LoginRepository {
+    val settings = Settings()
     companion object {
-        private val jsonParser = Json {
+        val jsonParser = Json {
             ignoreUnknownKeys = true
             isLenient = true
             coerceInputValues = true
         }
 
-        private val httpClient = HttpClient {
+        val httpClient = HttpClient {
             install(ContentNegotiation) {
                 json(jsonParser)
             }
@@ -47,14 +48,15 @@ class LoginRepository {
             val responseText = httpResponse.bodyAsText()
             val response = jsonParser.decodeFromString<LoginResponse>(responseText)
 
-            val token = response.token.orEmpty()
+            val token = response.token
             val mehmanId = response.mehmanId
             val emptyToken = "00000000-0000-0000-0000-000000000000"
+            settings.putString("AUTH_TOKEN", token)
 
             when {
                 token == emptyToken -> LoginState.Error("Please check with Jamaat Coordinator")
-                !mehmanId.isNullOrBlank() -> LoginState.NavigateToGuestLogin
-                else -> LoginState.NavigateToMemberLogin
+                mehmanId.isNotBlank() -> LoginState.NavigateToGuestLogin(response)
+                else -> LoginState.NavigateToMemberLogin(response)
             }
         } catch (e: Exception) {
             e.printStackTrace()
@@ -78,11 +80,10 @@ class LoginRepository {
             }
             val responseText = httpResponse.bodyAsText()
             val response = jsonParser.decodeFromString<LoginResponse>(responseText)
-            print("response ${response}")
-            if (response.mehmanId == null) {
+            if (response.mehmanId.isBlank()) {
                 LoginState.Error("Bad Its Id")
             } else {
-                LoginState.Success
+                LoginState.Completed
             }
         } catch (e: Exception) {
             e.printStackTrace()

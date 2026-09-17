@@ -11,33 +11,33 @@ sealed class Screen(val route: String) {
     object GuestLogin: Screen("guestLogin")
     object MemberLogin: Screen("memberLogin")
     object ForgotPassword: Screen("forgotPassword")
+    object HomeScreen: Screen("homeScreen")
 }
 // AppNavigation.kt
 @Composable
 fun AppNavigation() {
     val navController = rememberNavController()
 
-    NavHost(
-        navController = navController,
-        startDestination = Screen.ValidateITS.route
-    ) {
+    NavHost(navController = navController, startDestination = Screen.ValidateITS.route) {
         composable(route = Screen.ValidateITS.route) {
             NumberInputApiScreen(onNavigate = { loginState ->
-                if (loginState == LoginState.NavigateToGuestLogin) {
+                if (loginState is LoginState.NavigateToGuestLogin) {
                     navController.navigate(Screen.GuestLogin.route)
-                } else if (loginState == LoginState.NavigateToMemberLogin) {
+                } else if (loginState is LoginState.NavigateToMemberLogin) {
                     navController.navigate(Screen.MemberLogin.route)
                 }
             })
         }
         // Member Login Route
         composable(route = Screen.MemberLogin.route) {
-            MemberLoginScreen()
+            MemberLoginScreen(onNavigateToHome = {
+                navController.navigate(Screen.HomeScreen.route)
+            })
         }
 
         // Guest Login Route
         composable(route = Screen.GuestLogin.route) {
-            GuestLoginScreen(onLoginClick = {}, onForgotPasswordClick ={
+            GuestLoginScreen(onLoginClick = {}, onForgotPasswordClick = {
                 navController.navigate(Screen.ForgotPassword.route)
             })
         }
@@ -46,6 +46,10 @@ fun AppNavigation() {
         composable(route = Screen.ForgotPassword.route) {
             ForgotPasswordScreen(onSendEmailClick = {}, onBackClick = {
                 navController.popBackStack()})
+        }
+
+        composable(route = Screen.HomeScreen.route) {
+            Home()
         }
     }
 }

@@ -72,6 +72,15 @@ kotlin {
             implementation(libs.ktor.client.core)
             implementation(libs.ktor.client.content.negotiation)
             implementation(libs.ktor.serialization.kotlinx.json)
+            implementation(libs.kmp.shared.preference)
+            implementation(libs.kmp.shared.preference.no.arg)
+            // Kotlinx Serialization
+            implementation(libs.kotlinx.serialization.json)
+
+            // Ktor Client
+            implementation(libs.ktor.client.core)
+            implementation(libs.ktor.client.content.negotiation)
+            implementation(libs.ktor.serialization.kotlinx.json)
         }
 
         androidMain.dependencies {

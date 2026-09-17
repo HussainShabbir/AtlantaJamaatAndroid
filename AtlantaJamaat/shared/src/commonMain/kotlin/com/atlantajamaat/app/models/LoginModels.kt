@@ -11,11 +11,15 @@ val VERSION = "2"
 
 @Serializable
 data class LoginResponse(
-    @SerialName("Token")
-    val token: String? = null,
-
-    @SerialName("MehmanId")
-    val mehmanId: String? = null
+    @SerialName("ItsId") val itsId: String,
+    @SerialName("FirstName") val firstName: String,
+    @SerialName("LastName") val lastName: String,
+    @SerialName("Email") val email: String,
+    @SerialName("MehmanId") val mehmanId: String,
+    @SerialName("HOFFullName") val hofFullName: String,
+    @SerialName("HofItsId") val hofItsId: String,
+    @SerialName("HOFEmail") val hofEmail: String,
+    @SerialName("Token") val token: String,
 )
 
 @Serializable
@@ -28,9 +32,10 @@ data class LoginWrapper(
 sealed class LoginState {
     object Idle : LoginState()
     object Loading : LoginState()
-    object NavigateToGuestLogin : LoginState()
-    object NavigateToMemberLogin : LoginState()
-    object Success : LoginState()
+    object Completed: LoginState()
+    data class NavigateToGuestLogin(val response: LoginResponse) : LoginState()
+    data class NavigateToMemberLogin(val response: LoginResponse) : LoginState()
+    data class Success(val response: LoginResponse) : LoginState()
     data class Error(val message: String) : LoginState()
 }
 
